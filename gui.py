@@ -112,9 +112,7 @@ class MTAGui:
     
     def draw_header(self):
         """Draw the application header"""
-        # Header background - Taller for larger fonts
-        header_rect = pygame.Rect(0, 0, SCREEN_WIDTH, 140)
-        self.draw_rounded_rect(self.screen, CARD_BG, header_rect, 0)
+        # Header background removed
         
         # Title
         title_text = self.title_font.render("NYC Transit & Weather", True, WHITE)
@@ -139,9 +137,8 @@ class MTAGui:
         if not self.weather_data:
             return
             
-        # Weather card for detailed hourly forecast - Reduced height
+        # Weather card background removed
         weather_card = pygame.Rect(30, 160, SCREEN_WIDTH - 60, 240)
-        self.draw_rounded_rect(self.screen, CARD_BG, weather_card, 15)
         
         # Hourly forecast
         if 'hourly' in self.weather_data and self.weather_data['hourly']:
@@ -194,9 +191,7 @@ class MTAGui:
         uptown_card = pygame.Rect(30, 420, card_width, 220)
         downtown_card = pygame.Rect(50 + card_width, 420, card_width, 220)
         
-        # Draw cards
-        self.draw_rounded_rect(self.screen, CARD_BG, uptown_card, 15)
-        self.draw_rounded_rect(self.screen, CARD_BG, downtown_card, 15)
+        # Card backgrounds removed
         
         # Uptown section
         # Draw Q in circle (larger)
@@ -274,9 +269,8 @@ class MTAGui:
     
     def draw_bus_section(self):
         """Draw bus information"""
-        # Bus card spanning full width - positioned to fit within screen
+        # Bus card background removed
         bus_card = pygame.Rect(30, 660, SCREEN_WIDTH - 60, 180)
-        self.draw_rounded_rect(self.screen, CARD_BG, bus_card, 15)
         
         # Bus header (larger)
         bus_header = self.header_font.render("Buses - 83rd St & 2nd Ave", True, LIGHT_BLUE)
@@ -314,9 +308,14 @@ class MTAGui:
                     self.screen.blit(min_label, (arrival_x + 60, y_pos + 15))
                     
                     # Destination (larger font, more space)
-                    dest = arrival['destination'][:18] + "..." if len(arrival['destination']) > 18 else arrival['destination']
+                    dest = arrival['destination'][:12] + "..." if len(arrival['destination']) > 12 else arrival['destination']
                     dest_surface = self.regular_font.render(dest, True, LIGHT_GRAY)
                     self.screen.blit(dest_surface, (arrival_x + 130, y_pos + 12))
+                    
+                    # Stops away information
+                    stops = arrival.get('stops_away', 'Unknown')
+                    stops_surface = self.small_font.render(stops, True, YELLOW)
+                    self.screen.blit(stops_surface, (arrival_x + 280, y_pos + 12))
             else:
                 no_buses = self.header_font.render("No buses", True, GRAY)
                 self.screen.blit(no_buses, (arrival_x, route_y + 15))
@@ -324,9 +323,8 @@ class MTAGui:
     def draw_loading(self):
         """Draw loading indicator"""
         if self.loading:
-            # Loading card (larger)
+            # Loading card background removed
             load_card = pygame.Rect(SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT // 2 - 75, 500, 150)
-            self.draw_rounded_rect(self.screen, CARD_BG, load_card, 15)
             
             loading_text = self.header_font.render("Loading transit data...", True, WHITE)
             loading_rect = loading_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
@@ -362,9 +360,8 @@ class MTAGui:
                 self.draw_subway_section()
                 self.draw_bus_section()
             
-            # Instructions with background (larger)
+            # Instructions background removed
             instruction_rect = pygame.Rect(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 50)
-            self.draw_rounded_rect(self.screen, CARD_BG, instruction_rect, 0)
             
             instruction_text = "Press 'R' to refresh  •  'ESC' to exit"
             instruction_surface = self.regular_font.render(instruction_text, True, LIGHT_GRAY)

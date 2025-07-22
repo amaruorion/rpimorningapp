@@ -108,12 +108,22 @@ class BusTracker:
                                 if minutes_away > 0:
                                     minutes_away = minutes_away - 1
                                 
+                                # Get stops away information
+                                stops_away = call.get("StopsFromCall", "Unknown")
+                                if stops_away == 0:
+                                    stops_away = "At stop"
+                                elif isinstance(stops_away, int):
+                                    stops_away = f"{stops_away} stops"
+                                else:
+                                    stops_away = "Unknown"
+                                
                                 # Don't show if adjusted time would be negative
                                 if minutes_away >= 0:
                                     arrivals[route_short].append({
                                         "minutes": minutes_away,
                                         "time": arrival_time.strftime("%H:%M"),
-                                        "destination": journey.get("DestinationName", "")
+                                        "destination": journey.get("DestinationName", ""),
+                                        "stops_away": stops_away
                                     })
                                     real_data_found = True
                     else:
@@ -157,10 +167,15 @@ class BusTracker:
                 arrival_time = datetime.now().replace(second=0, microsecond=0)
                 arrival_time = arrival_time.replace(minute=arrival_time.minute + minutes)
                 
+                # Mock stops away data
+                stops = random.randint(1, 8)
+                stops_away = f"{stops} stops" if stops > 0 else "At stop"
+                
                 arrivals[route].append({
                     "minutes": minutes,
                     "time": arrival_time.strftime("%H:%M"),
-                    "destination": destinations[route]
+                    "destination": destinations[route],
+                    "stops_away": stops_away
                 })
         
         return arrivals
@@ -176,7 +191,8 @@ class BusTracker:
             print(f"\n{route}:")
             if arrivals[route]:
                 for arrival in arrivals[route]:
-                    dest = arrival["destination"][:20] + "..." if len(arrival["destination"]) > 20 else arrival["destination"]
-                    print(f"  {arrival['minutes']} min ({arrival['time']}) → {dest}")
+                    dest = arrival["destination"][:15] + "..." if len(arrival["destination"]) > 15 else arrival["destination"]
+                    stops = arrival.get("stops_away", "Unknown")
+                    print(f"  {arrival['minutes']} min ({arrival['time']}) → {dest} • {stops}")
             else:
                 print("  No upcoming buses")
