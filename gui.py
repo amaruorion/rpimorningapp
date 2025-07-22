@@ -159,10 +159,16 @@ class MTAGui:
                 temp_surface = self.large_font.render(temp_text, True, WHITE)
                 self.screen.blit(temp_surface, (hour_x, hourly_y + 70))
                 
+                # Feels like temperature (smaller, below actual temp)
+                if 'feels_like' in hour_data:
+                    feels_text = f"Feels {hour_data['feels_like']}°F"
+                    feels_surface = self.small_font.render(feels_text, True, LIGHT_GRAY)
+                    self.screen.blit(feels_surface, (hour_x, hourly_y + 100))
+                
                 # Weather condition description (more prominent and clear)
                 desc_text = hour_data['description'].title()[:12]  # Full description, capitalized
                 desc_surface = self.regular_font.render(desc_text, True, WHITE)
-                self.screen.blit(desc_surface, (hour_x, hourly_y + 115))
+                self.screen.blit(desc_surface, (hour_x, hourly_y + 125))
                 
                 # No weather symbol - just the description text is enough
                 
@@ -170,19 +176,19 @@ class MTAGui:
                 if 'pop' in hour_data:
                     pop_text = f"Rain: {int(hour_data['pop'] * 100)}%"
                     pop_surface = self.small_font.render(pop_text, True, LIGHT_BLUE)
-                    self.screen.blit(pop_surface, (hour_x, hourly_y + 170))
+                    self.screen.blit(pop_surface, (hour_x, hourly_y + 155))
                 
                 # Humidity
                 if 'humidity' in hour_data:
                     humidity_text = f"Humidity: {hour_data['humidity']}%"
                     humidity_surface = self.small_font.render(humidity_text, True, LIGHT_GRAY)
-                    self.screen.blit(humidity_surface, (hour_x, hourly_y + 195))
+                    self.screen.blit(humidity_surface, (hour_x, hourly_y + 180))
                 
                 # Wind speed
                 if 'wind_speed' in hour_data:
                     wind_text = f"Wind: {hour_data['wind_speed']}mph"
                     wind_surface = self.small_font.render(wind_text, True, LIGHT_GRAY)
-                    self.screen.blit(wind_surface, (hour_x, hourly_y + 220))
+                    self.screen.blit(wind_surface, (hour_x, hourly_y + 205))
     
     def draw_subway_section(self):
         """Draw Q train information"""

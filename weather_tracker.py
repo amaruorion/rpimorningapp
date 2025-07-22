@@ -146,6 +146,7 @@ class WeatherTracker:
                         hourly.append({
                             "hour": forecast_time.strftime("%I%p").lstrip('0'),
                             "temp": round(item['main']['temp']),
+                            "feels_like": round(item['main'].get('feels_like', item['main']['temp'])),
                             "icon": item['weather'][0]['icon'],
                             "description": item['weather'][0]['description'].title(),
                             "pop": item.get('pop', 0),  # Precipitation probability
@@ -184,9 +185,12 @@ class WeatherTracker:
         for i in range(5):
             hour = (current_hour + i * 3) % 24
             temp_variation = random.randint(-5, 5)
+            actual_temp = base_temp + temp_variation
+            feels_like_temp = actual_temp + random.randint(-3, 5)  # Feels like can be different
             hourly.append({
                 "hour": f"{hour % 12 or 12}{'PM' if hour >= 12 else 'AM'}",
-                "temp": base_temp + temp_variation,
+                "temp": actual_temp,
+                "feels_like": feels_like_temp,
                 "icon": "01d" if 6 <= hour < 18 else "01n",
                 "description": "Clear Sky",
                 "pop": random.randint(0, 30) / 100,  # 0-30% chance of rain
@@ -217,6 +221,7 @@ class WeatherTracker:
                     hourly.append({
                         "hour": forecast_time.strftime("%I%p").lstrip('0'),
                         "temp": round(item['main']['temp']),
+                        "feels_like": round(item['main'].get('feels_like', item['main']['temp'])),
                         "icon": item['weather'][0]['icon'],
                         "description": item['weather'][0]['description'].title(),
                         "pop": item.get('pop', 0),  # Precipitation probability
