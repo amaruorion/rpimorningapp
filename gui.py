@@ -139,8 +139,8 @@ class MTAGui:
         if not self.weather_data:
             return
             
-        # Weather card for detailed hourly forecast - Much larger
-        weather_card = pygame.Rect(30, 160, SCREEN_WIDTH - 60, 280)
+        # Weather card for detailed hourly forecast - Reduced height
+        weather_card = pygame.Rect(30, 160, SCREEN_WIDTH - 60, 240)
         self.draw_rounded_rect(self.screen, CARD_BG, weather_card, 15)
         
         # Hourly forecast
@@ -189,10 +189,10 @@ class MTAGui:
     
     def draw_subway_section(self):
         """Draw Q train information"""
-        # Subway cards side by side - adjusted for larger weather section and bigger cards
+        # Subway cards side by side - adjusted positioning
         card_width = (SCREEN_WIDTH - 80) // 2
-        uptown_card = pygame.Rect(30, 460, card_width, 260)
-        downtown_card = pygame.Rect(50 + card_width, 460, card_width, 260)
+        uptown_card = pygame.Rect(30, 420, card_width, 220)
+        downtown_card = pygame.Rect(50 + card_width, 420, card_width, 220)
         
         # Draw cards
         self.draw_rounded_rect(self.screen, CARD_BG, uptown_card, 15)
@@ -274,8 +274,8 @@ class MTAGui:
     
     def draw_bus_section(self):
         """Draw bus information"""
-        # Bus card spanning full width (much larger)
-        bus_card = pygame.Rect(30, 740, SCREEN_WIDTH - 60, 200)
+        # Bus card spanning full width - positioned to fit within screen
+        bus_card = pygame.Rect(30, 660, SCREEN_WIDTH - 60, 180)
         self.draw_rounded_rect(self.screen, CARD_BG, bus_card, 15)
         
         # Bus header (larger)
@@ -363,12 +363,12 @@ class MTAGui:
                 self.draw_bus_section()
             
             # Instructions with background (larger)
-            instruction_rect = pygame.Rect(0, SCREEN_HEIGHT - 60, SCREEN_WIDTH, 60)
+            instruction_rect = pygame.Rect(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 50)
             self.draw_rounded_rect(self.screen, CARD_BG, instruction_rect, 0)
             
             instruction_text = "Press 'R' to refresh  •  'ESC' to exit"
             instruction_surface = self.regular_font.render(instruction_text, True, LIGHT_GRAY)
-            text_rect = instruction_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 30))
+            text_rect = instruction_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 25))
             self.screen.blit(instruction_surface, text_rect)
             
             pygame.display.flip()
