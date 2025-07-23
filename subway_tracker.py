@@ -2,6 +2,7 @@ import requests
 from google.transit import gtfs_realtime_pb2
 from datetime import datetime
 import config
+import os
 
 class SubwayTracker:
     def __init__(self):
@@ -9,6 +10,11 @@ class SubwayTracker:
         
     def get_q_train_arrivals(self):
         """Get Q train arrival times for both uptown and downtown"""
+        # Check if we should use mock data (for testing)
+        if os.environ.get('USE_MOCK_DATA', '').lower() in ['1', 'true', 'yes']:
+            print("🧪 Using MOCK subway data for testing")
+            return self._get_mock_data()
+            
         # Try main MTA API first
         arrivals = self._try_mta_api()
         if arrivals:
@@ -110,25 +116,18 @@ class SubwayTracker:
                                             offset = config.SUBWAY_TIME_OFFSET_MINUTES
                                         corrected_arrival_time = arrival_time + timedelta(minutes=offset)
                                     
-                                    # Calculate minutes away from corrected time vs current time
+                                    # Calculate minutes away from corrected time
                                     now = datetime.now()
                                     
-                                    # Skip if the arrival time is in the past
+                                    # Skip if the corrected arrival time is in the past
                                     if corrected_arrival_time < now:
                                         continue
                                     
+                                    # Calculate minutes from corrected arrival time
                                     time_diff = (corrected_arrival_time - now).total_seconds()
                                     minutes_away = round(time_diff / 60)
                                     
-                                    # Subtract one minute from the arrival time
-                                    if minutes_away > 0:
-                                        minutes_away = minutes_away - 1
-                                    
-                                    # Subtract another minute for uptown only
-                                    if direction == "uptown" and minutes_away > 0:
-                                        minutes_away = minutes_away - 1
-                                    
-                                    # Don't show if adjusted time would be negative
+                                    # Don't show if time would be negative
                                     if minutes_away >= 0:
                                         arrivals[direction].append({
                                             "minutes": minutes_away,

@@ -1,6 +1,7 @@
 import requests
 from datetime import datetime
 import config
+import os
 
 class BusTracker:
     def __init__(self):
@@ -37,6 +38,11 @@ class BusTracker:
     
     def get_bus_arrivals(self, stop_id=None):
         """Get M101, M102, M103 bus arrival times"""
+        # Check if we should use mock data (for testing)
+        if os.environ.get('USE_MOCK_DATA', '').lower() in ['1', 'true', 'yes']:
+            print("🚌 Using MOCK bus data for testing")
+            return self._get_mock_data()
+            
         # Try real API first
         arrivals, error_msg = self._try_bus_api(stop_id)
         if any(arrivals.values()):  # If we got any real data

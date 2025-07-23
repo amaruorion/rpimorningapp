@@ -38,7 +38,7 @@ BUS_STOP_IDS = {
 
 # Time adjustment (in minutes) - positive number makes times later, negative makes them earlier
 SUBWAY_TIME_OFFSET_MINUTES = {
-    "uptown": 0,    # No offset for uptown
+    "uptown": -2,   # Subtract 2 minutes for uptown (currently 2 minutes fast)
     "downtown": -5  # Subtract 5 minutes for downtown (currently 5 minutes fast)
 }
 

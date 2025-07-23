@@ -3,6 +3,7 @@ from datetime import datetime
 import config
 import socket
 import requests.packages.urllib3.util.connection as urllib3_cn
+import os
 
 # Force IPv4 to avoid network issues
 def allowed_gai_family():
@@ -19,6 +20,11 @@ class WeatherTracker:
         
     def get_weather_data(self):
         """Get current weather data from OpenWeatherMap"""
+        # Check if we should use mock data (for testing)
+        if os.environ.get('USE_MOCK_DATA', '').lower() in ['1', 'true', 'yes']:
+            print("☁ Using MOCK weather data for testing")
+            return self._get_mock_weather()
+            
         # Try with progressively longer timeouts
         for timeout in [20, 30, 45]:
             try:

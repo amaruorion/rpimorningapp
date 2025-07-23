@@ -16,38 +16,48 @@ from weather_tracker import WeatherTracker
 # Initialize Pygame
 pygame.init()
 
-# Colors
+# Modern UI Colors with Gradients
 BLACK = (0, 0, 0)
-DARK_BG = (20, 25, 30)
-CARD_BG = (30, 35, 40)
-WHITE = (255, 255, 255)
-BLUE = (0, 123, 191)  # MTA Blue
-LIGHT_BLUE = (100, 181, 246)
-ORANGE = (255, 108, 0)  # MTA Orange
-LIGHT_ORANGE = (255, 183, 77)
-GREEN = (0, 147, 60)  # MTA Green
-LIGHT_GREEN = (129, 199, 132)
-RED = (238, 53, 36)   # MTA Red
-GRAY = (128, 128, 128)
-LIGHT_GRAY = (200, 200, 200)
-YELLOW = (255, 235, 59)
+BG_DARK = (10, 10, 15)  # Deep space black with blue tint
+BG_GRADIENT_TOP = (15, 15, 25)  # Slightly lighter for gradient
+BG_GRADIENT_BOTTOM = (5, 5, 10)  # Darker for depth
+
+# Primary Colors - Vibrant and Modern
+PRIMARY_BLUE = (0, 122, 255)  # iOS blue
+PRIMARY_GREEN = (52, 199, 89)  # Success green
+PRIMARY_ORANGE = (255, 149, 0)  # Warning orange
+PRIMARY_RED = (255, 59, 48)  # Danger red
+PRIMARY_PURPLE = (175, 82, 222)  # Accent purple
+PRIMARY_CYAN = (50, 173, 230)  # Info cyan
+
+# Glass/Card Colors with Transparency
+CARD_BG = (255, 255, 255, 10)  # White with low opacity
+CARD_BORDER = (255, 255, 255, 30)  # White border with opacity
+TEXT_PRIMARY = (255, 255, 255)  # Pure white
+TEXT_SECONDARY = (200, 200, 210)  # Slightly muted
+TEXT_MUTED = (150, 150, 170)  # Muted text
+
+# Accent Colors
+ACCENT_GOLD = (255, 215, 0)  # Premium gold
+ACCENT_SILVER = (192, 192, 192)  # Metallic silver
+SHADOW = (0, 0, 0, 50)  # Shadow color
 
 # Screen dimensions
 SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 900
+SCREEN_HEIGHT = 680
 
 class MTAGui:
     def __init__(self):
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("MTA Morning Transit Tracker")
+        pygame.display.set_caption("Transit Command Center - NYC")
         
-        # Fonts - Reduced sizes
-        self.title_font = pygame.font.Font(None, 48)
-        self.header_font = pygame.font.Font(None, 36)
-        self.regular_font = pygame.font.Font(None, 28)
-        self.small_font = pygame.font.Font(None, 22)
-        self.large_font = pygame.font.Font(None, 56)
-        self.xlarge_font = pygame.font.Font(None, 72)
+        # Clean, readable fonts - much smaller
+        self.title_font = pygame.font.Font(None, 36)
+        self.header_font = pygame.font.Font(None, 28)
+        self.regular_font = pygame.font.Font(None, 24)
+        self.small_font = pygame.font.Font(None, 20)
+        self.large_font = pygame.font.Font(None, 32)
+        self.time_font = pygame.font.Font(None, 48)  # For time display only
         
         # Transit trackers
         self.subway_tracker = SubwayTracker()
@@ -89,252 +99,251 @@ class MTAGui:
             
             time.sleep(30)  # Update every 30 seconds
     
+    def draw_gradient_background(self):
+        """Draw a modern gradient background"""
+        for y in range(SCREEN_HEIGHT):
+            color_ratio = y / SCREEN_HEIGHT
+            r = int(BG_GRADIENT_TOP[0] * (1 - color_ratio) + BG_GRADIENT_BOTTOM[0] * color_ratio)
+            g = int(BG_GRADIENT_TOP[1] * (1 - color_ratio) + BG_GRADIENT_BOTTOM[1] * color_ratio)
+            b = int(BG_GRADIENT_TOP[2] * (1 - color_ratio) + BG_GRADIENT_BOTTOM[2] * color_ratio)
+            pygame.draw.line(self.screen, (r, g, b), (0, y), (SCREEN_WIDTH, y))
+    
+    def draw_glass_card(self, rect, color_tint=None, border_color=None, shadow=True):
+        """Draw a modern glassmorphic card with blur effect"""
+        # Shadow
+        if shadow:
+            shadow_rect = rect.copy()
+            shadow_rect.x += 5
+            shadow_rect.y += 5
+            shadow_surface = pygame.Surface((shadow_rect.width, shadow_rect.height), pygame.SRCALPHA)
+            pygame.draw.rect(shadow_surface, (0, 0, 0, 100), shadow_surface.get_rect(), border_radius=20)
+            self.screen.blit(shadow_surface, (shadow_rect.x, shadow_rect.y))
+        
+        # Glass effect background
+        card_surface = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+        base_color = color_tint if color_tint else (255, 255, 255, 15)
+        pygame.draw.rect(card_surface, base_color, card_surface.get_rect(), border_radius=20)
+        
+        # Border
+        border = border_color if border_color else (255, 255, 255, 40)
+        pygame.draw.rect(card_surface, border, card_surface.get_rect(), 2, border_radius=20)
+        
+        self.screen.blit(card_surface, (rect.x, rect.y))
+        
     def draw_rounded_rect(self, surface, color, rect, radius=10):
         """Draw a rounded rectangle"""
         pygame.draw.rect(surface, color, rect, border_radius=radius)
     
+    # Removed complex data visualization
+    
+    # Removed confusing status indicator method
+    
+    # Removed overly complex time badge method
+    
     def _get_weather_color(self, icon_code):
         """Get color based on weather condition"""
         if icon_code.startswith('01'):  # Clear
-            return YELLOW
+            return ACCENT_GOLD
         elif icon_code.startswith('02') or icon_code.startswith('03'):  # Clouds
-            return LIGHT_GRAY
+            return ACCENT_SILVER
         elif icon_code.startswith('04'):  # Broken clouds
-            return GRAY
+            return TEXT_MUTED
         elif icon_code.startswith('09') or icon_code.startswith('10'):  # Rain
-            return LIGHT_BLUE
+            return PRIMARY_BLUE
         elif icon_code.startswith('11'):  # Thunderstorm
-            return RED
+            return PRIMARY_RED
         elif icon_code.startswith('13'):  # Snow
-            return WHITE
+            return TEXT_PRIMARY
         else:
-            return LIGHT_GREEN
+            return PRIMARY_GREEN
     
     def draw_header(self):
-        """Draw the application header"""
-        # Header background removed
+        """Draw clean, simple header"""
+        # Simple background card
+        header_rect = pygame.Rect(20, 15, SCREEN_WIDTH - 40, 60)
+        self.draw_glass_card(header_rect, shadow=False)
         
         # Title
-        title_text = self.title_font.render("NYC Transit & Weather", True, WHITE)
-        title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 45))
-        self.screen.blit(title_text, title_rect)
+        title = "NYC Transit Tracker"
+        title_surface = self.title_font.render(title, True, TEXT_PRIMARY)
+        self.screen.blit(title_surface, (40, 25))
         
-        # Current time
-        current_time = datetime.now().strftime("%A, %B %d - %I:%M:%S %p")
-        time_text = self.regular_font.render(current_time, True, LIGHT_GRAY)
-        time_rect = time_text.get_rect(center=(SCREEN_WIDTH // 2, 90))
-        self.screen.blit(time_text, time_rect)
+        # Current time - simple and clean
+        current_time = datetime.now()
+        time_str = current_time.strftime("%I:%M %p")
+        date_str = current_time.strftime("%A, %B %d")
         
-        # Last update
+        # Time display
+        time_surface = self.time_font.render(time_str, True, TEXT_PRIMARY)
+        time_rect = time_surface.get_rect(right=SCREEN_WIDTH - 40, centery=35)
+        self.screen.blit(time_surface, time_rect)
+        
+        # Date below time
+        date_surface = self.small_font.render(date_str, True, TEXT_SECONDARY)
+        date_rect = date_surface.get_rect(right=SCREEN_WIDTH - 40, top=55)
+        self.screen.blit(date_surface, date_rect)
+        
+        # Last update - simple text
         if not self.loading:
-            update_text = f"Updated: {self.last_update.strftime('%I:%M:%S %p')}"
-            update_surface = self.small_font.render(update_text, True, GRAY)
-            update_rect = update_surface.get_rect(center=(SCREEN_WIDTH // 2, 120))
-            self.screen.blit(update_surface, update_rect)
+            update_text = f"Last updated: {self.last_update.strftime('%I:%M %p')}"
+            update_surface = self.small_font.render(update_text, True, TEXT_MUTED)
+            self.screen.blit(update_surface, (40, 55))
     
     def draw_weather_section(self):
-        """Draw hourly weather forecast only"""
+        """Draw clean weather section"""
         if not self.weather_data:
             return
             
-        # Weather card background removed
-        weather_card = pygame.Rect(30, 160, SCREEN_WIDTH - 60, 240)
+        # Section header
+        header_y = 95
+        weather_title = self.header_font.render("Weather - Next 5 Hours", True, TEXT_PRIMARY)
+        self.screen.blit(weather_title, (20, header_y))
         
-        # Hourly forecast
+        # Weather cards - much simpler
         if 'hourly' in self.weather_data and self.weather_data['hourly']:
-            hourly_y = weather_card.y + 30
-            hourly_title = self.header_font.render("Hourly Forecast", True, LIGHT_GREEN)
-            self.screen.blit(hourly_title, (weather_card.x + 30, hourly_y))
+            card_width = 230
+            card_height = 120
+            start_x = 20
+            start_y = 125
             
             for i, hour_data in enumerate(self.weather_data['hourly'][:5]):
-                hour_x = weather_card.x + 40 + (i * 225)
+                card_x = start_x + (i * (card_width + 10))
+                card_rect = pygame.Rect(card_x, start_y, card_width, card_height)
                 
-                # Hour label
-                hour_text = hour_data['hour']
-                hour_surface = self.header_font.render(hour_text, True, YELLOW)
-                self.screen.blit(hour_surface, (hour_x, hourly_y + 40))
+                # Simple card background
+                self.draw_glass_card(card_rect)
                 
-                # Temperature (prominent but not overlapping)
+                # Hour
+                hour_surface = self.regular_font.render(hour_data['hour'], True, PRIMARY_CYAN)
+                self.screen.blit(hour_surface, (card_x + 15, start_y + 15))
+                
+                # Temperature - reasonable size
                 temp_text = f"{hour_data['temp']}°F"
-                temp_surface = self.large_font.render(temp_text, True, WHITE)
-                self.screen.blit(temp_surface, (hour_x, hourly_y + 70))
+                temp_surface = self.large_font.render(temp_text, True, TEXT_PRIMARY)
+                self.screen.blit(temp_surface, (card_x + 15, start_y + 40))
                 
-                # Feels like temperature (smaller, below actual temp)
-                if 'feels_like' in hour_data:
-                    feels_text = f"Feels {hour_data['feels_like']}°F"
-                    feels_surface = self.small_font.render(feels_text, True, LIGHT_GRAY)
-                    self.screen.blit(feels_surface, (hour_x, hourly_y + 100))
+                # Weather description
+                desc_text = hour_data['description'].title()
+                if len(desc_text) > 18:
+                    desc_text = desc_text[:15] + "..."
+                desc_surface = self.small_font.render(desc_text, True, TEXT_SECONDARY)
+                self.screen.blit(desc_surface, (card_x + 15, start_y + 75))
                 
-                # Weather condition description (more prominent and clear)
-                desc_text = hour_data['description'].title()[:12]  # Full description, capitalized
-                desc_surface = self.regular_font.render(desc_text, True, WHITE)
-                self.screen.blit(desc_surface, (hour_x, hourly_y + 125))
-                
-                # No weather symbol - just the description text is enough
-                
-                # Precipitation probability
-                if 'pop' in hour_data:
-                    pop_text = f"Rain: {int(hour_data['pop'] * 100)}%"
-                    pop_surface = self.small_font.render(pop_text, True, LIGHT_BLUE)
-                    self.screen.blit(pop_surface, (hour_x, hourly_y + 155))
-                
-                # Humidity
-                if 'humidity' in hour_data:
-                    humidity_text = f"Humidity: {hour_data['humidity']}%"
-                    humidity_surface = self.small_font.render(humidity_text, True, LIGHT_GRAY)
-                    self.screen.blit(humidity_surface, (hour_x, hourly_y + 180))
-                
-                # Wind speed
-                if 'wind_speed' in hour_data:
-                    wind_text = f"Wind: {hour_data['wind_speed']}mph"
-                    wind_surface = self.small_font.render(wind_text, True, LIGHT_GRAY)
-                    self.screen.blit(wind_surface, (hour_x, hourly_y + 205))
+                # Simple rain chance
+                if 'pop' in hour_data and hour_data['pop'] > 0:
+                    rain_text = f"Rain: {int(hour_data['pop'] * 100)}%"
+                    rain_surface = self.small_font.render(rain_text, True, PRIMARY_BLUE)
+                    self.screen.blit(rain_surface, (card_x + 15, start_y + 95))
     
     def draw_subway_section(self):
-        """Draw Q train information"""
-        # Subway cards side by side - adjusted positioning
-        card_width = (SCREEN_WIDTH - 80) // 2
-        uptown_card = pygame.Rect(30, 420, card_width, 220)
-        downtown_card = pygame.Rect(50 + card_width, 420, card_width, 220)
+        """Draw clean subway section"""
+        # Section header
+        header_y = 265
+        subway_title = self.header_font.render("Q Train - 86th Street", True, TEXT_PRIMARY)
+        self.screen.blit(subway_title, (20, header_y))
         
-        # Card backgrounds removed
+        # Simple side-by-side cards
+        card_width = (SCREEN_WIDTH - 60) // 2
+        card_height = 160
+        uptown_x = 20
+        downtown_x = 30 + card_width
+        cards_y = 295
         
-        # Uptown section
-        # Draw Q in circle (larger)
-        pygame.draw.circle(self.screen, YELLOW, (uptown_card.x + 50, uptown_card.y + 45), 35)
-        q_text = self.header_font.render("Q", True, BLACK)
-        q_rect = q_text.get_rect(center=(uptown_card.x + 50, uptown_card.y + 45))
-        self.screen.blit(q_text, q_rect)
+        # Uptown card
+        uptown_rect = pygame.Rect(uptown_x, cards_y, card_width, card_height)
+        self.draw_glass_card(uptown_rect)
         
-        uptown_header = self.header_font.render("Uptown", True, YELLOW)
-        self.screen.blit(uptown_header, (uptown_card.x + 100, uptown_card.y + 20))
+        # Direction header
+        direction_surface = self.header_font.render("Uptown (Queens)", True, PRIMARY_ORANGE)
+        self.screen.blit(direction_surface, (uptown_x + 15, cards_y + 15))
         
-        dest_text = self.regular_font.render("Queens/Astoria", True, GRAY)
-        self.screen.blit(dest_text, (uptown_card.x + 100, uptown_card.y + 60))
-        
-        # Uptown arrivals (larger spacing and fonts)
+        # Arrivals - simple list
         if self.subway_data["uptown"]:
             for i, arrival in enumerate(self.subway_data["uptown"][:3]):
-                y_pos = uptown_card.y + 110 + (i * 50)
+                arrival_y = cards_y + 45 + (i * 30)
                 
-                # Time in minutes (extra large)
-                min_text = f"{arrival['minutes']}"
-                color = LIGHT_GREEN if arrival['minutes'] <= 5 else WHITE
-                min_surface = self.large_font.render(min_text, True, color)
-                self.screen.blit(min_surface, (uptown_card.x + 35, y_pos))
-                
-                # "min" label (larger)
-                min_label = self.regular_font.render("min", True, GRAY)
-                self.screen.blit(min_label, (uptown_card.x + 100 + (15 if arrival['minutes'] < 10 else 0), y_pos + 15))
-                
-                # Clock time (larger)
-                time_text = arrival['time']
-                time_surface = self.header_font.render(time_text, True, LIGHT_GRAY)
-                self.screen.blit(time_surface, (uptown_card.x + 200, y_pos + 10))
+                # Simple time display
+                time_text = f"{arrival['minutes']} min - {arrival['time']}"
+                color = PRIMARY_RED if arrival['minutes'] <= 2 else PRIMARY_ORANGE if arrival['minutes'] <= 5 else TEXT_PRIMARY
+                time_surface = self.regular_font.render(time_text, True, color)
+                self.screen.blit(time_surface, (uptown_x + 15, arrival_y))
         else:
-            no_trains = self.header_font.render("No trains", True, GRAY)
-            no_trains_rect = no_trains.get_rect(center=(uptown_card.centerx, uptown_card.centery + 30))
-            self.screen.blit(no_trains, no_trains_rect)
+            no_data = self.regular_font.render("No trains", True, TEXT_MUTED)
+            self.screen.blit(no_data, (uptown_x + 15, cards_y + 70))
         
-        # Downtown section
-        # Draw Q in circle (larger)
-        pygame.draw.circle(self.screen, YELLOW, (downtown_card.x + 50, downtown_card.y + 45), 35)
-        q_text = self.header_font.render("Q", True, BLACK)
-        q_rect = q_text.get_rect(center=(downtown_card.x + 50, downtown_card.y + 45))
-        self.screen.blit(q_text, q_rect)
+        # Downtown card
+        downtown_rect = pygame.Rect(downtown_x, cards_y, card_width, card_height)
+        self.draw_glass_card(downtown_rect)
         
-        downtown_header = self.header_font.render("Downtown", True, YELLOW)
-        self.screen.blit(downtown_header, (downtown_card.x + 100, downtown_card.y + 20))
+        # Direction header
+        direction_surface = self.header_font.render("Downtown (Brooklyn)", True, PRIMARY_BLUE)
+        self.screen.blit(direction_surface, (downtown_x + 15, cards_y + 15))
         
-        dest_text = self.regular_font.render("Brooklyn/Brighton Beach", True, GRAY)
-        self.screen.blit(dest_text, (downtown_card.x + 100, downtown_card.y + 60))
-        
-        # Downtown arrivals (larger spacing and fonts)
+        # Arrivals - simple list
         if self.subway_data["downtown"]:
             for i, arrival in enumerate(self.subway_data["downtown"][:3]):
-                y_pos = downtown_card.y + 110 + (i * 50)
+                arrival_y = cards_y + 45 + (i * 30)
                 
-                # Time in minutes (extra large)
-                min_text = f"{arrival['minutes']}"
-                color = LIGHT_GREEN if arrival['minutes'] <= 5 else WHITE
-                min_surface = self.large_font.render(min_text, True, color)
-                self.screen.blit(min_surface, (downtown_card.x + 35, y_pos))
-                
-                # "min" label (larger)
-                min_label = self.regular_font.render("min", True, GRAY)
-                self.screen.blit(min_label, (downtown_card.x + 100 + (15 if arrival['minutes'] < 10 else 0), y_pos + 15))
-                
-                # Clock time (larger)
-                time_text = arrival['time']
-                time_surface = self.header_font.render(time_text, True, LIGHT_GRAY)
-                self.screen.blit(time_surface, (downtown_card.x + 200, y_pos + 10))
+                # Simple time display
+                time_text = f"{arrival['minutes']} min - {arrival['time']}"
+                color = PRIMARY_RED if arrival['minutes'] <= 2 else PRIMARY_ORANGE if arrival['minutes'] <= 5 else TEXT_PRIMARY
+                time_surface = self.regular_font.render(time_text, True, color)
+                self.screen.blit(time_surface, (downtown_x + 15, arrival_y))
         else:
-            no_trains = self.header_font.render("No trains", True, GRAY)
-            no_trains_rect = no_trains.get_rect(center=(downtown_card.centerx, downtown_card.centery + 30))
-            self.screen.blit(no_trains, no_trains_rect)
+            no_data = self.regular_font.render("No trains", True, TEXT_MUTED)
+            self.screen.blit(no_data, (downtown_x + 15, cards_y + 70))
     
     def draw_bus_section(self):
-        """Draw bus information"""
-        # Bus card background removed
-        bus_card = pygame.Rect(30, 660, SCREEN_WIDTH - 60, 180)
+        """Draw clean bus section"""
+        # Section header
+        header_y = 475
+        bus_title = self.header_font.render("Buses - 83rd & 2nd Ave", True, TEXT_PRIMARY)
+        self.screen.blit(bus_title, (20, header_y))
         
-        # Bus header (larger)
-        bus_header = self.header_font.render("Buses - 83rd St & 2nd Ave", True, LIGHT_BLUE)
-        self.screen.blit(bus_header, (bus_card.x + 30, bus_card.y + 20))
-        
-        # Bus routes side by side (larger spacing)
+        # Simple bus cards
         routes = ["M102", "M103"]
-        route_width = (bus_card.width - 60) // 2
+        card_width = (SCREEN_WIDTH - 60) // 2
+        card_height = 120
+        cards_y = 505
         
         for i, route in enumerate(routes):
-            route_x = bus_card.x + 30 + (i * route_width)
-            route_y = bus_card.y + 70
+            card_x = 20 + (i * (card_width + 20))
+            card_rect = pygame.Rect(card_x, cards_y, card_width, card_height)
             
-            # Route number in circle (larger)
-            circle_color = BLUE if route == "M102" else LIGHT_BLUE
-            pygame.draw.circle(self.screen, circle_color, (route_x + 40, route_y + 30), 40)
-            route_text = self.header_font.render(route[1:], True, WHITE)
-            route_rect = route_text.get_rect(center=(route_x + 40, route_y + 30))
-            self.screen.blit(route_text, route_rect)
+            # Simple card
+            self.draw_glass_card(card_rect)
             
-            # Route arrivals (larger fonts and spacing)
-            arrival_x = route_x + 100
+            # Route header
+            route_color = PRIMARY_GREEN if route == "M102" else PRIMARY_PURPLE
+            route_surface = self.header_font.render(route, True, route_color)
+            self.screen.blit(route_surface, (card_x + 15, cards_y + 15))
+            
+            # Arrivals - simple list
             if self.bus_data[route]:
-                for j, arrival in enumerate(self.bus_data[route][:3]):
-                    y_pos = route_y + (j * 45)
+                for j, arrival in enumerate(self.bus_data[route][:2]):
+                    arrival_y = cards_y + 45 + (j * 30)
                     
-                    # Time in minutes (larger)
-                    min_text = f"{arrival['minutes']}"
-                    color = LIGHT_GREEN if arrival['minutes'] <= 5 else WHITE
-                    min_surface = self.large_font.render(min_text, True, color)
-                    self.screen.blit(min_surface, (arrival_x, y_pos))
-                    
-                    # "min" label (larger)
-                    min_label = self.regular_font.render("min", True, GRAY)
-                    self.screen.blit(min_label, (arrival_x + 60, y_pos + 15))
-                    
-                    # Destination (larger font, more space)
-                    dest = arrival['destination'][:12] + "..." if len(arrival['destination']) > 12 else arrival['destination']
-                    dest_surface = self.regular_font.render(dest, True, LIGHT_GRAY)
-                    self.screen.blit(dest_surface, (arrival_x + 130, y_pos + 12))
-                    
-                    # Stops away information
-                    stops = arrival.get('stops_away', 'Unknown')
-                    stops_surface = self.small_font.render(stops, True, YELLOW)
-                    self.screen.blit(stops_surface, (arrival_x + 280, y_pos + 12))
+                    # Simple time and destination
+                    time_text = f"{arrival['minutes']} min - {arrival['destination'][:25]}"
+                    color = PRIMARY_RED if arrival['minutes'] <= 2 else PRIMARY_ORANGE if arrival['minutes'] <= 5 else TEXT_PRIMARY
+                    time_surface = self.regular_font.render(time_text, True, color)
+                    self.screen.blit(time_surface, (card_x + 15, arrival_y))
             else:
-                no_buses = self.header_font.render("No buses", True, GRAY)
-                self.screen.blit(no_buses, (arrival_x, route_y + 15))
+                no_data = self.regular_font.render("No buses", True, TEXT_MUTED)
+                self.screen.blit(no_data, (card_x + 15, cards_y + 60))
     
     def draw_loading(self):
-        """Draw loading indicator"""
+        """Draw simple loading indicator"""
         if self.loading:
-            # Loading card background removed
-            load_card = pygame.Rect(SCREEN_WIDTH // 2 - 250, SCREEN_HEIGHT // 2 - 75, 500, 150)
+            # Simple loading panel
+            load_panel = pygame.Rect(SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 - 50, 400, 100)
+            self.draw_glass_card(load_panel)
             
-            loading_text = self.header_font.render("Loading transit data...", True, WHITE)
-            loading_rect = loading_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-            self.screen.blit(loading_text, loading_rect)
+            # Loading text
+            loading_text = "Loading transit data..."
+            loading_surface = self.header_font.render(loading_text, True, TEXT_PRIMARY)
+            loading_rect = loading_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            self.screen.blit(loading_surface, loading_rect)
     
     def run(self):
         """Main application loop"""
@@ -353,8 +362,8 @@ class MTAGui:
                         self.loading = True
                         threading.Thread(target=self.fetch_data_loop, daemon=True).start()
             
-            # Clear screen with dark background
-            self.screen.fill(DARK_BG)
+            # Draw gradient background
+            self.draw_gradient_background()
             
             # Draw components
             self.draw_header()
@@ -366,13 +375,11 @@ class MTAGui:
                 self.draw_subway_section()
                 self.draw_bus_section()
             
-            # Instructions background removed
-            instruction_rect = pygame.Rect(0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, 50)
-            
-            instruction_text = "Press 'R' to refresh  •  'ESC' to exit"
-            instruction_surface = self.regular_font.render(instruction_text, True, LIGHT_GRAY)
-            text_rect = instruction_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 25))
-            self.screen.blit(instruction_surface, text_rect)
+            # Simple footer - positioned right after bus section
+            footer_text = "Press R to refresh • ESC to exit"
+            footer_surface = self.small_font.render(footer_text, True, TEXT_MUTED)
+            footer_rect = footer_surface.get_rect(center=(SCREEN_WIDTH // 2, 645))
+            self.screen.blit(footer_surface, footer_rect)
             
             pygame.display.flip()
             clock.tick(60)  # 60 FPS
