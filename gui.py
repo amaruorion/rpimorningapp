@@ -199,10 +199,10 @@ class MTAGui:
         weather_title = self.header_font.render("Weather - Next 5 Hours", True, TEXT_PRIMARY)
         self.screen.blit(weather_title, (20, header_y))
         
-        # Weather cards - much simpler
+        # Weather cards with detailed information
         if 'hourly' in self.weather_data and self.weather_data['hourly']:
             card_width = 230
-            card_height = 120
+            card_height = 160  # Increased height for more info
             start_x = 20
             start_y = 125
             
@@ -210,44 +210,69 @@ class MTAGui:
                 card_x = start_x + (i * (card_width + 10))
                 card_rect = pygame.Rect(card_x, start_y, card_width, card_height)
                 
-                # Simple card background
+                # Card background
                 self.draw_glass_card(card_rect)
                 
                 # Hour
                 hour_surface = self.regular_font.render(hour_data['hour'], True, PRIMARY_CYAN)
-                self.screen.blit(hour_surface, (card_x + 15, start_y + 15))
+                self.screen.blit(hour_surface, (card_x + 15, start_y + 10))
                 
-                # Temperature - reasonable size
+                # Temperature - main temp
                 temp_text = f"{hour_data['temp']}°F"
                 temp_surface = self.large_font.render(temp_text, True, TEXT_PRIMARY)
-                self.screen.blit(temp_surface, (card_x + 15, start_y + 40))
+                self.screen.blit(temp_surface, (card_x + 15, start_y + 30))
+                
+                # Feels like temperature
+                if 'feels_like' in hour_data:
+                    feels_text = f"Feels: {hour_data['feels_like']}°F"
+                    feels_surface = self.small_font.render(feels_text, True, TEXT_SECONDARY)
+                    self.screen.blit(feels_surface, (card_x + 15, start_y + 60))
                 
                 # Weather description
                 desc_text = hour_data['description'].title()
                 if len(desc_text) > 18:
                     desc_text = desc_text[:15] + "..."
                 desc_surface = self.small_font.render(desc_text, True, TEXT_SECONDARY)
-                self.screen.blit(desc_surface, (card_x + 15, start_y + 75))
+                self.screen.blit(desc_surface, (card_x + 15, start_y + 80))
                 
-                # Simple rain chance
-                if 'pop' in hour_data and hour_data['pop'] > 0:
+                # Rain chance
+                if 'pop' in hour_data:
                     rain_text = f"Rain: {int(hour_data['pop'] * 100)}%"
-                    rain_surface = self.small_font.render(rain_text, True, PRIMARY_BLUE)
-                    self.screen.blit(rain_surface, (card_x + 15, start_y + 95))
+                    rain_color = PRIMARY_BLUE if hour_data['pop'] > 0.3 else TEXT_MUTED
+                    rain_surface = self.small_font.render(rain_text, True, rain_color)
+                    self.screen.blit(rain_surface, (card_x + 15, start_y + 100))
+                
+                # Humidity
+                if 'humidity' in hour_data:
+                    humidity_text = f"Humidity: {hour_data['humidity']}%"
+                    humidity_surface = self.small_font.render(humidity_text, True, TEXT_MUTED)
+                    self.screen.blit(humidity_surface, (card_x + 15, start_y + 120))
+                
+                # Wind speed and direction
+                if 'wind_speed' in hour_data:
+                    wind_text = f"Wind: {hour_data['wind_speed']} mph"
+                    if 'wind_deg' in hour_data:
+                        # Convert wind degree to direction
+                        wind_deg = hour_data['wind_deg']
+                        directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
+                        direction = directions[int((wind_deg + 22.5) / 45) % 8]
+                        wind_text = f"Wind: {direction} {hour_data['wind_speed']} mph"
+                    wind_surface = self.small_font.render(wind_text, True, TEXT_MUTED)
+                    self.screen.blit(wind_surface, (card_x + 15, start_y + 140))
     
     def draw_subway_section(self):
         """Draw clean subway section"""
-        # Section header
-        header_y = 265
+        # Section header - moved down for taller weather cards
+        header_y = 305
         subway_title = self.header_font.render("Q Train - 86th Street", True, TEXT_PRIMARY)
         self.screen.blit(subway_title, (20, header_y))
         
         # Simple side-by-side cards
         card_width = (SCREEN_WIDTH - 60) // 2
-        card_height = 160
+        card_height = 140  # Slightly smaller to fit
         uptown_x = 20
         downtown_x = 30 + card_width
-        cards_y = 295
+        cards_y = 335
         
         # Uptown card
         uptown_rect = pygame.Rect(uptown_x, cards_y, card_width, card_height)
@@ -295,16 +320,16 @@ class MTAGui:
     
     def draw_bus_section(self):
         """Draw clean bus section"""
-        # Section header
-        header_y = 475
+        # Section header - moved down
+        header_y = 495
         bus_title = self.header_font.render("Buses - 83rd & 2nd Ave", True, TEXT_PRIMARY)
         self.screen.blit(bus_title, (20, header_y))
         
         # Simple bus cards
         routes = ["M102", "M103"]
         card_width = (SCREEN_WIDTH - 60) // 2
-        card_height = 120
-        cards_y = 505
+        card_height = 110  # Slightly smaller to fit
+        cards_y = 525
         
         for i, route in enumerate(routes):
             card_x = 20 + (i * (card_width + 20))
@@ -378,7 +403,7 @@ class MTAGui:
             # Simple footer - positioned right after bus section
             footer_text = "Press R to refresh • ESC to exit"
             footer_surface = self.small_font.render(footer_text, True, TEXT_MUTED)
-            footer_rect = footer_surface.get_rect(center=(SCREEN_WIDTH // 2, 645))
+            footer_rect = footer_surface.get_rect(center=(SCREEN_WIDTH // 2, 655))
             self.screen.blit(footer_surface, footer_rect)
             
             pygame.display.flip()
